@@ -34,9 +34,9 @@
   "main": "./dist/extension.js",
   "scripts": {
     "vscode:prepublish": "pnpm run package",
-    "compile": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
-    "watch": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch",
-    "package": "pnpm run compile -- --minify",
+    "compile": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "package": "node esbuild.js --production",
     "lint": "eslint src",
     "test": "vitest run",
     "test:watch": "vitest watch",
