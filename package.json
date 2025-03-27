@@ -1,0 +1,113 @@
+{
+  "name": "deepseek-copilot",
+  "displayName": "DeepSeek Copilot",
+  "description": "AI-powered code completion using DeepSeek (GitHub Copilot alternative)",
+  "version": "0.1.0",
+  "publisher": "Exodus_Tola",
+  "engines": {
+    "vscode": "^1.98.0"
+  },
+  "license": "MIT",
+  "categories": [
+    "Programming Languages",
+    "AI"
+  ],
+  "keywords": [
+    "AI",
+    "DeepSeek",
+    "Copilot",
+    "autocomplete",
+    "code suggestions"
+  ],
+  "icon": "images/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/exodus-tola-mindCoder/DeepSeek-Copilot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/exodus-tola-mindCoder/DeepSeek-Copilot/issues"
+  },
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "scripts": {
+    "vscode:prepublish": "pnpm run package",
+    "compile": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
+    "watch": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch",
+    "package": "pnpm run compile -- --minify",
+    "lint": "eslint src",
+    "test": "vscode-test run --extensionDevelopmentPath=. --extensionTestsPath=./test/extension.test",
+    "test:watch": "nodemon --watch src --watch test --exec pnpm test",
+    "pretest": "pnpm run compile"
+  },
+  "contributes": {
+    "configuration": {
+      "title": "DeepSeek Copilot",
+      "properties": {
+        "deepseekCopilot.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Your DeepSeek API key (get from platform.deepseek.com)",
+          "scope": "application"
+        },
+        "deepseekCopilot.maxTokens": {
+          "type": "number",
+          "default": 100,
+          "description": "Maximum tokens for AI responses",
+          "minimum": 10,
+          "maximum": 2048
+        },
+        "deepseekCopilot.enableInline": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable inline code suggestions"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "deepseek-copilot.setApiKey",
+        "title": "Set DeepSeek API Key",
+        "category": "DeepSeek Copilot"
+      },
+      {
+        "command": "deepseek-copilot.clearApiKey",
+        "title": "Clear Saved API Key",
+        "category": "DeepSeek Copilot"
+      },
+      {
+        "command": "deepseek-copilot.explainCode",
+        "title": "Explain Selected Code",
+        "category": "DeepSeek Copilot"
+      },
+      {
+        "command": "deepseek-copilot.suggestCode",
+        "title": "Get Code Suggestion",
+        "category": "DeepSeek Copilot"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "deepseek-copilot.explainCode",
+        "key": "ctrl+alt+e",
+        "mac": "cmd+alt+e",
+        "when": "editorHasSelection"
+      }
+    ]
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.98.0",
+    "@typescript-eslint/eslint-plugin": "^8.28.0",
+    "@typescript-eslint/parser": "^8.28.0",
+    "esbuild": "^0.20.2",
+    "eslint": "^9.23.0",
+    "nodemon": "^3.1.0",
+    "typescript": "^5.8.2",
+    "vscode-test": "^1.8.0"
+  },
+  "dependencies": {
+    "axios": "^1.8.4",
+    "limiter": "^3.0.0"
+  }
+}
