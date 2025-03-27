@@ -27,21 +27,21 @@
   "bugs": {
     "url": "https://github.com/exodus-tola-mindCoder/DeepSeek-Copilot/issues"
   },
-  "activationEvents": [],
-  "main": "./dist/extension.ts",
+  "activationEvents": [
+    "onCommand:deepseek-copilot.explainCode",
+    "onCommand:deepseek-copilot.suggestCode"
+  ],
+  "main": "./dist/extension.js",
   "scripts": {
     "vscode:prepublish": "pnpm run package",
     "compile": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
     "watch": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch",
     "package": "pnpm run compile -- --minify",
     "lint": "eslint src",
-  "test": "vitest run",
-  "test:watch": "vitest watch",
-  "pretest": "pnpm run compile"
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "pretest": "pnpm run compile"
   },
-  "test": "vitest run",
-  "test:watch": "vitest watch",
-  "pretest": "pnpm run compile",
   "contributes": {
     "configuration": {
       "title": "DeepSeek Copilot",
