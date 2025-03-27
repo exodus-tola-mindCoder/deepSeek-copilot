@@ -28,17 +28,20 @@
     "url": "https://github.com/exodus-tola-mindCoder/DeepSeek-Copilot/issues"
   },
   "activationEvents": [],
-  "main": "./dist/extension.js",
+  "main": "./dist/extension.ts",
   "scripts": {
     "vscode:prepublish": "pnpm run package",
     "compile": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
     "watch": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch",
     "package": "pnpm run compile -- --minify",
     "lint": "eslint src",
-    "test": "vscode-test run --extensionDevelopmentPath=. --extensionTestsPath=./test/extension.test",
-    "test:watch": "nodemon --watch src --watch test --exec pnpm test",
-    "pretest": "pnpm run compile"
+  "test": "vitest run",
+  "test:watch": "vitest watch",
+  "pretest": "pnpm run compile"
   },
+  "test": "vitest run",
+  "test:watch": "vitest watch",
+  "pretest": "pnpm run compile",
   "contributes": {
     "configuration": {
       "title": "DeepSeek Copilot",
@@ -100,10 +103,12 @@
     "@types/vscode": "^1.98.0",
     "@typescript-eslint/eslint-plugin": "^8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
+    "@vscode/test-electron": "^2.4.1",
     "esbuild": "^0.20.2",
     "eslint": "^9.23.0",
     "nodemon": "^3.1.0",
     "typescript": "^5.8.2",
+    "vitest": "^3.0.9",
     "vscode-test": "^1.6.1"
   },
   "dependencies": {
