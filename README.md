@@ -29,13 +29,18 @@ cd DeepSeek-Copilot
 npm install
 code .
 
+Build & Run
+Command	| Action
+pnpm run compile |	Production build
+pnpm run watch |	Development mode (live reload)
+pnpm run package |	Create VSIX for local testing
+F5 in VS Code	|Launch debug session
+
 Configuration ⚙️
 Set your DeepSeek API key:
 
 Open Command Palette (Ctrl+Shift+P)
-
 Run: DeepSeek Copilot: Set API Key
-
 Enter your API key from platform.deepseek.com
 
 Settings (in settings.json):
