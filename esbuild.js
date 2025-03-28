@@ -1,56 +1,21 @@
-const esbuild = require("esbuild");
+const esbuild = require('esbuild');
+const path = require('path');
+const { nodeExternalsPlugin } = require('esbuild-node-externals');
 
-const production = process.argv.includes('--production');
-const watch = process.argv.includes('--watch');
+const isProduction = process.argv.includes('--production');
 
-/**
- * @type {import('esbuild').Plugin}
- */
-const esbuildProblemMatcherPlugin = {
-	name: 'esbuild-problem-matcher',
-
-	setup(build) {
-		build.onStart(() => {
-			console.log('[watch] build started');
-		});
-		build.onEnd((result) => {
-			result.errors.forEach(({ text, location }) => {
-				console.error(`✘ [ERROR] ${text}`);
-				console.error(`    ${location.file}:${location.line}:${location.column}:`);
-			});
-			console.log('[watch] build finished');
-		});
-	},
-};
-
-async function main() {
-	const ctx = await esbuild.context({
-		entryPoints: [
-			'src/extension.ts'
-		],
-		bundle: true,
-		format: 'cjs',
-		minify: production,
-		sourcemap: !production,
-		sourcesContent: false,
-		platform: 'node',
-		outfile: 'dist/extension.js',
-		external: ['vscode'],
-		logLevel: 'silent',
-		plugins: [
-			/* add to the end of plugins array */
-			esbuildProblemMatcherPlugin,
-		],
-	});
-	if (watch) {
-		await ctx.watch();
-	} else {
-		await ctx.rebuild();
-		await ctx.dispose();
+esbuild.build({
+	entryPoints: ['src/extension.ts'],
+	bundle: true,
+	outfile: 'dist/extension.js',
+	external: ['vscode'],
+	format: 'cjs',
+	platform: 'node',
+	target: 'node14',
+	minify: isProduction,
+	sourcemap: !isProduction,
+	plugins: [nodeExternalsPlugin()],
+	define: {
+		'process.env.NODE_ENV': isProduction ? '"production"' : '"development"'
 	}
-}
-
-main().catch(e => {
-	console.error(e);
-	process.exit(1);
-});
+}).catch(() => process.exit(1));

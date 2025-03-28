@@ -1,6 +1,20 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { AuthService } from './auth';
 import * as vscode from 'vscode';
+
+interface DeepSeekResponse {
+    choices: Array<{
+        text: string;
+        detail?: string;
+        documentation?: string;
+    }>;
+}
+
+interface Suggestion {
+    text: string;
+    detail?: string;
+    documentation?: string;
+}
 
 const API_URL = 'https://api.deepseek.com/v1/completions';
 const RATE_LIMIT_DELAY = 1000; // 1 second between requests
@@ -9,7 +23,7 @@ let lastRequestTime = 0;
 export async function getCodeSuggestion(
     prompt: string,
     context: vscode.ExtensionContext
-): Promise<string> {
+): Promise<Suggestion[]> {
     try {
         // Rate limiting
         const now = Date.now();
@@ -17,34 +31,54 @@ export async function getCodeSuggestion(
         await new Promise(resolve => setTimeout(resolve, delay));
         lastRequestTime = Date.now();
 
-        // Get secure API key
         const apiKey = await AuthService.getApiKey();
+        const config = vscode.workspace.getConfiguration('deepseekCopilot');
+        const maxTokens = config.get<number>('maxTokens', 100);
 
-        const response = await axios.post(API_URL, {
-            prompt,
-            max_tokens: vscode.workspace.getConfiguration('deepseekCopilot').get('maxTokens') || 100,
-            temperature: 0.7
-        }, {
-            headers: { 
-                'Authorization': `Bearer ${apiKey}`,
-                'Content-Type': 'application/json'
+        const response = await axios.post<DeepSeekResponse>(
+            API_URL,
+            {
+                prompt,
+                max_tokens: maxTokens,
+                temperature: 0.7,
+                top_p: 0.9,
+                frequency_penalty: 0,
+                presence_penalty: 0
             },
-            timeout: 15000
-        });
+            {
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                timeout: 15000
+            }
+        );
 
-        return response.data.choices[0].text.trim();
+        if (!response.data?.choices?.length) {
+            throw new Error('No suggestions returned from API');
+        }
+
+        return response.data.choices.map(choice => ({
+            text: choice.text.trim(),
+            detail: choice.detail,
+            documentation: choice.documentation
+        }));
     } catch (error) {
-        console.error('DeepSeek API Error:', error);
-        
-        if (error.response?.status === 401) {
+        const axiosError = error as AxiosError;
+
+        if (axiosError.response?.status === 401) {
             await AuthService.clearApiKey();
-            throw new Error('Invalid API key - please set a new one');
+            throw new Error('Invalid API key - please set a new one using "DeepSeek: Set API Key"');
+        }
+
+        if (axiosError.code === 'ECONNABORTED') {
+            throw new Error('Request to DeepSeek API timed out');
         }
 
         throw new Error(
-            error.response?.data?.error?.message || 
-            error.message || 
-            'Failed to get AI suggestion'
+            (axiosError.response?.data as any)?.error?.message ||
+            axiosError.message ||
+            'Failed to get AI suggestions'
         );
     }
 }
