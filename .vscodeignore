@@ -9,3 +9,5 @@ node_modules
 *.ts
 *.map
 *.tsbuildinfo
+*.log
+*.test.ts

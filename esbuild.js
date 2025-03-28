@@ -1,10 +1,9 @@
-const esbuild = require('esbuild');
-const path = require('path');
-const { nodeExternalsPlugin } = require('esbuild-node-externals');
+import { build } from 'esbuild';
+import { nodeExternalsPlugin } from 'esbuild-node-externals';
 
 const isProduction = process.argv.includes('--production');
 
-esbuild.build({
+build({
 	entryPoints: ['src/extension.ts'],
 	bundle: true,
 	outfile: 'dist/extension.js',

@@ -28,19 +28,26 @@
     "url": "https://github.com/exodus-tola-mindCoder/DeepSeek-Copilot/issues"
   },
   "activationEvents": [
-    "onCommand:deepseek-copilot.explainCode",
-    "onCommand:deepseek-copilot.suggestCode"
+    "onLanguage:javascript",
+    "onLanguage:typescript",
+    "onLanguage:python",
+    "onLanguage:java",
+    "onLanguage:c",
+    "onLanguage:cpp",
+    "onLanguage:go",
+    "onLanguage:rust"
   ],
   "main": "./dist/extension.js",
   "scripts": {
     "vscode:prepublish": "pnpm run package",
     "compile": "tsc && node esbuild.js",
-    "watch": "tsc -w && node esbuild.js --watch",
+    "watch": "concurrently \"tsc -w\" \"node esbuild.js --watch\"",
     "package": "node esbuild.js --production",
-    "lint": "eslint src",
+    "lint": "eslint src --ext .ts",
     "test": "vitest run",
     "test:watch": "vitest watch",
-    "pretest": "pnpm run compile"
+    "pretest": "pnpm run compile",
+    "publish": "vsce publish"
   },
   "contributes": {
     "configuration": {
@@ -63,6 +70,13 @@
           "type": "boolean",
           "default": true,
           "description": "Enable inline code suggestions"
+        },
+        "deepseekCopilot.suggestionDelay": {
+          "type": "number",
+          "default": 300,
+          "description": "Delay before showing suggestions (ms)",
+          "minimum": 0,
+          "maximum": 2000
         }
       }
     },
@@ -95,7 +109,22 @@
         "mac": "cmd+alt+e",
         "when": "editorHasSelection"
       }
-    ]
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "deepseek-copilot.explainCode",
+          "when": "editorHasSelection",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "deepseek-copilot.setApiKey",
+          "when": "false"
+        }
+      ]
+    }
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
@@ -104,15 +133,15 @@
     "@typescript-eslint/eslint-plugin": "^8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
     "@vscode/test-electron": "^2.4.1",
+    "concurrently": "^8.2.2",
     "esbuild": "^0.20.2",
+    "esbuild-node-externals": "^1.7.0",
     "eslint": "^9.23.0",
-    "nodemon": "^3.1.0",
     "typescript": "^5.8.2",
     "vitest": "^3.0.9",
-    "vscode-test": "^1.6.1"
+    "vsce": "^2.24.0"
   },
   "dependencies": {
-    "axios": "^1.8.4",
-    "limiter": "^3.0.0"
+    "axios": "^1.8.4"
   }
 }
