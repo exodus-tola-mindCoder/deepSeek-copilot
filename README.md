@@ -1,71 +1,82 @@
-<!-- # deepseek-copilot README
+# DeepSeek Copilot 🤖💻
 
-This is the README for your extension "deepseek-copilot". After writing up a brief description, we recommend including the following sections.
+[![VS Code Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/Exodus_Tola.deepseek-copilot?color=blue&label=VS%20Code%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=Exodus_Tola.deepseek-copilot)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/exodus-tola-mindCoder/DeepSeek-Copilot/pulls)
 
-## Features
+An AI-powered VS Code extension that provides intelligent code completions and explanations using the DeepSeek API (a GitHub Copilot alternative).
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+![Demo GIF](https://github.com/exodus-tola-mindCoder/DeepSeek-Copilot/raw/main/images/demo.gif)  
+*(Replace with your actual demo GIF)*
 
-For example if there is an image subfolder under your extension project workspace:
+## Features ✨
+- **AI Code Completions**: Context-aware suggestions for multiple languages
+- **Code Explanations**: Understand complex code via `Ctrl+Alt+E` (Windows) / `Cmd+Alt+E` (Mac)
+- **Secure API Key Management**: Encrypted storage using VS Code's secret API
+- **Configurable**: Set max tokens, enable/disable inline suggestions
+- **Multi-Language Support**: JavaScript, TypeScript, Python, Java, C++, and more
 
-\!\[feature X\]\(images/feature-x.png\)
+## Installation 🛠️
+### Via VS Code Marketplace
+1. Open VS Code Extensions (`Ctrl+Shift+X`)
+2. Search for **"DeepSeek Copilot"**
+3. Click **Install**
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+### Manual Installation
+```bash
+git clone https://github.com/exodus-tola-mindCoder/DeepSeek-Copilot.git
+cd DeepSeek-Copilot
+npm install
+code .
 
-## Requirements
+Configuration ⚙️
+Set your DeepSeek API key:
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+Open Command Palette (Ctrl+Shift+P)
 
-## Extension Settings
+Run: DeepSeek Copilot: Set API Key
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+Enter your API key from platform.deepseek.com
 
-For example:
+Settings (in settings.json):
+{
+  "deepseekCopilot.apiKey": "sk-your-key-here",
+  "deepseekCopilot.maxTokens": 150,
+  "deepseekCopilot.enableInline": true
+}
 
-This extension contributes the following settings:
+Development 🧑‍💻
+Prerequisites
+Node.js ≥ 16
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+VS Code ≥ 1.75
 
-## Known Issues
+DeepSeek API key
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+#Setup
+git clone https://github.com/exodus-tola-mindCoder/DeepSeek-Copilot.git
+cd deepSeek-Copilot
+pnpm install
 
-## Release Notes
+Project Structure 📂
 
-Users appreciate release notes as you update your extension.
+DeepSeek-Copilot/
+├── src/
+│   ├── api/            # DeepSeek API interactions
+│   ├── providers/      # VS Code language features
+│   └── extension.ts    # Extension entry point
+├── test/               # Unit tests
+├── package.json        # Extension manifest
+└── README.md           # You are here :)
 
-### 1.0.0
 
-Initial release of ...
+How to Contribute 🤝
+We welcome contributions! Here's how:
+1.Fork the repository
+2. Create a branch (git checkout -b feature/your-feature)
+3. Commit changes (git commit -m 'Add amazing feature')
+4.Push to branch (git push origin feature/your-feature)
+5.Open a Pull Request
 
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!** -->
+License 📜
+MIT © Exodus_Tola
