@@ -2,7 +2,7 @@
   "name": "deepseek-copilot",
   "displayName": "DeepSeek Copilot",
   "description": "AI-powered code completion using DeepSeek (GitHub Copilot alternative)",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "publisher": "exodus-tola",
   "engines": {
     "vscode": "^1.56.0"
