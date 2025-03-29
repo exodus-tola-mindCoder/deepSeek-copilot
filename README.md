@@ -92,7 +92,5 @@ No! End users should install from the Marketplace. Manual builds are only for co
 5. Open a Pull Request
 
 
-
-
 📜 License
-© MIT  [Exodus_Tola](https://github.com/exodus-tola-mindCoder)
+© MIT  Exodus_Tola
