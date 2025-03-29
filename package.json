@@ -121,7 +121,7 @@
       "commandPalette": [
         {
           "command": "deepseek-copilot.setApiKey",
-          "when": "false"
+          "when": "true"
         }
       ]
     }

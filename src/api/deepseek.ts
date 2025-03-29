@@ -35,15 +35,18 @@ export async function getCodeSuggestion(
         const config = vscode.workspace.getConfiguration('deepseekCopilot');
         const maxTokens = config.get<number>('maxTokens', 100);
 
-        const response = await axios.post<DeepSeekResponse>(
-            API_URL,
+        const response = await axios.post(
+            'https://api.deepseek.com/v1/chat/completions',
             {
-                prompt,
+                model: "deepseek-chat",
+                messages: [
+                    {
+                        role: "user",
+                        content: prompt
+                    }
+                ],
                 max_tokens: maxTokens,
                 temperature: 0.7,
-                top_p: 0.9,
-                frequency_penalty: 0,
-                presence_penalty: 0
             },
             {
                 headers: {
@@ -58,27 +61,18 @@ export async function getCodeSuggestion(
             throw new Error('No suggestions returned from API');
         }
 
-        return response.data.choices.map(choice => ({
-            text: choice.text.trim(),
-            detail: choice.detail,
-            documentation: choice.documentation
+        return response.data.choices.map((choice: { message?: { content?: string } }) => ({
+            text: choice.message?.content?.trim() || "",
+            detail: "AI-generated suggestion",
         }));
     } catch (error) {
         const axiosError = error as AxiosError;
+        console.error("API Error:", axiosError.response?.data);
 
-        if (axiosError.response?.status === 401) {
-            await AuthService.clearApiKey();
-            throw new Error('Invalid API key - please set a new one using "DeepSeek: Set API Key"');
+        if (axiosError.response?.status === 422) {
+            throw new Error("Invalid request format. Please update the extension.");
         }
-
-        if (axiosError.code === 'ECONNABORTED') {
-            throw new Error('Request to DeepSeek API timed out');
-        }
-
-        throw new Error(
-            (axiosError.response?.data as any)?.error?.message ||
-            axiosError.message ||
-            'Failed to get AI suggestions'
-        );
+        throw error;
     }
+    return [];
 }
