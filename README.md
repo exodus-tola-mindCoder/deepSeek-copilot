@@ -6,7 +6,6 @@
 
 An AI-powered VS Code extension that provides intelligent code completions and explanations using the [DeepSeek API](https://platform.deepseek.com).
 
-![Demo GIF](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcW5pZ3N6b3VlZ2NqY2VqZGNqZGNqZGNqZGNqZGNqZGNqZGc3a3BxZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/your-demo-gif-id.gif) *(Replace with actual demo GIF)*
 
 ## 🚀 Features
 
