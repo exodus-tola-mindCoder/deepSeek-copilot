@@ -1,9 +1,16 @@
 # DeepSeek Copilot 🤖💻  
+## 📦 Install DeepSeek Copilot
 
-[![VS Code Marketplace Version](https://marketplace.visualstudio.com/items?itemName=exodus-tola.deepseek-copilot)](https://marketplace.visualstudio.com/items?itemName=Exodus_Tola.deepseek-copilot)  
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)  
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/exodus-tola-mindCoder/DeepSeek-Copilot/pulls)  
+[![Version](https://img.shields.io/visual-studio-marketplace/v/exodus-tola.deepseek-copilot?color=blue)](https://marketplace.visualstudio.com/items?itemName=exodus-tola.deepseek-copilot)
+[![Installs](https://img.shields.io/visual-studio-marketplace/i/exodus-tola.deepseek-copilot?color=success)](https://marketplace.visualstudio.com/items?itemName=exodus-tola.deepseek-copilot)
 
+### One-click install:
+[![Install in VS Code](https://img.shields.io/badge/-Install%20Now-007ACC?logo=visual-studio-code)](vscode:extension/exodus-tola.deepseek-copilot)
+
+### Or search manually:
+1. Open VS Code Extensions (`Ctrl+Shift+X`)
+2. Search for "DeepSeek Copilot"
+3. Click Install
 An AI-powered VS Code extension that provides **intelligent code completions** and **explanations** using the [DeepSeek API](https://platform.deepseek.com).  
 
 ---
