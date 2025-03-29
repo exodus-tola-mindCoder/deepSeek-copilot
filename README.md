@@ -1,87 +1,92 @@
-# DeepSeek Copilot 🤖💻
+# DeepSeek Copilot 🤖💻  
 
-[![VS Code Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/Exodus_Tola.deepseek-copilot?color=blue&label=VS%20Code%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=Exodus_Tola.deepseek-copilot)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/exodus-tola-mindCoder/DeepSeek-Copilot/pulls)
+[![VS Code Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/Exodus_Tola.deepseek-copilot?color=blue&label=VS%20Code%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=Exodus_Tola.deepseek-copilot)  
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)  
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/exodus-tola-mindCoder/DeepSeek-Copilot/pulls)  
 
-An AI-powered VS Code extension that provides intelligent code completions and explanations using the DeepSeek API (a GitHub Copilot alternative).
+An AI-powered VS Code extension that provides **intelligent code completions** and **explanations** using the [DeepSeek API](https://platform.deepseek.com).  
 
 ![Demo GIF](https://github.com/exodus-tola-mindCoder/DeepSeek-Copilot/raw/main/images/demo.gif)  
-*(Replace with your actual demo GIF)*
 
-## Features ✨
-- **AI Code Completions**: Context-aware suggestions for multiple languages
-- **Code Explanations**: Understand complex code via `Ctrl+Alt+E` (Windows) / `Cmd+Alt+E` (Mac)
-- **Secure API Key Management**: Encrypted storage using VS Code's secret API
-- **Configurable**: Set max tokens, enable/disable inline suggestions
-- **Multi-Language Support**: JavaScript, TypeScript, Python, Java, C++, and more
+---
 
-## Installation 🛠️
-### Via VS Code Marketplace
-1. Open VS Code Extensions (`Ctrl+Shift+X`)
-2. Search for **"DeepSeek Copilot"**
-3. Click **Install**
+## 🚀 Features  
+- **Smart Code Completions** - Context-aware suggestions for 10+ languages  
+- **Explain Code** - Get detailed explanations via `Ctrl+Alt+E` (Win) / `Cmd+Alt+E` (Mac)  
+- **Secure API Key Storage** - Encrypted using VS Code's [Secret API](https://code.visualstudio.com/api/references/vscode-api#SecretStorage)  
+- **Configurable** - Control token limits, inline suggestions, and more  
+- **Multi-Language Support** - JavaScript, Python, Java, C++, Rust, and more  
 
-### Manual Installation
+---
+
+## 🔧 Installation  
+### **Via VS Code Marketplace**  
+1. Open Extensions (`Ctrl+Shift+X`)  
+2. Search for **"DeepSeek Copilot"**  
+3. Click **Install**  
+
+### **Manual Build**  
 ```bash
 git clone https://github.com/exodus-tola-mindCoder/DeepSeek-Copilot.git
 cd DeepSeek-Copilot
-npm install
-code .
+pnpm install && pnpm run package
+code --install-extension *.vsix
 
-Build & Run
-Command	| Action
-pnpm run compile |	Production build
-pnpm run watch |	Development mode (live reload)
-pnpm run package |	Create VSIX for local testing
-F5 in VS Code	|Launch debug session
 
-Configuration ⚙️
-Set your DeepSeek API key:
+⚙️ Configuration
+1. Set Your API Key
 
-Open Command Palette (Ctrl+Shift+P)
-Run: DeepSeek Copilot: Set API Key
-Enter your API key from platform.deepseek.com
+   1. Get a free API key: platform.deepseek.com
+   2. In VS Code:
+     👉 Run Command Palette (Ctrl+Shift+P)
+     👉 Select: DeepSeek Copilot: Set API Key
 
-Settings (in settings.json):
-{
-  "deepseekCopilot.apiKey": "sk-your-key-here",
-  "deepseekCopilot.maxTokens": 150,
-  "deepseekCopilot.enableInline": true
+
+ 2. Settings (settings.json);
+ {
+  "deepseekCopilot.apiKey": "sk-your-key-here",  // Required
+  "deepseekCopilot.maxTokens": 150,              // Default: 100
+  "deepseekCopilot.enableInline": true           // Toggle suggestions
 }
 
-Development 🧑‍💻
-Prerequisites
-Node.js ≥ 16
+🛠️ Development
+ Prerequisites
+  - Node.js ≥ 18
+  - VS Code ≥ 1.85
+  - DeepSeek API Key (Get Free Credits)
 
-VS Code ≥ 1.75
 
-DeepSeek API key
+  
+Command	Action
+pnpm run compile 👉	Production build
+pnpm run watch   👉	Dev mode (live reload)
+pnpm run package 👉 Generate .vsix for testing
+F5 in VS Code    👉	Launch debug session
 
-#Setup
-git clone https://github.com/exodus-tola-mindCoder/DeepSeek-Copilot.git
-cd deepSeek-Copilot
-pnpm install
 
-Project Structure 📂
-
-DeepSeek-Copilot/
+Project Structure
+deepSeek-copilot/
 ├── src/
-│   ├── api/            # DeepSeek API interactions
+│   ├── api/            # DeepSeek API client
 │   ├── providers/      # VS Code language features
-│   └── extension.ts    # Extension entry point
-├── test/               # Unit tests
-├── package.json        # Extension manifest
-└── README.md           # You are here :)
+│   └── extension.ts    # Entry point
+├── test/               # Vitest unit tests
+└── package.json        # Extension manifest
 
 
-How to Contribute 🤝
-We welcome contributions! Here's how:
-1.Fork the repository
-2. Create a branch (git checkout -b feature/your-feature)
-3. Commit changes (git commit -m 'Add amazing feature')
-4.Push to branch (git push origin feature/your-feature)
-5.Open a Pull Request
+❓ FAQ
+Q: Why am I getting "402 Payment Required"?
+A: Your DeepSeek account needs credits. Check balance:
 
-License 📜
+Q: How do I disable inline suggestions?
+"deepseekCopilot.enableInline": false
+
+🤝 Contributing
+1. Fork the repo
+2. Create a branch: git checkout -b feature/your-idea
+3. Commit changes: git commit -m 'Add awesome feature'
+4. Push: git push origin feature/your-idea
+5. Open a PR!
+
+📜 License
 MIT © Exodus_Tola
