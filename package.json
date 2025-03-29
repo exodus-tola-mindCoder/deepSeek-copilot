@@ -2,7 +2,7 @@
   "name": "deepseek-copilot",
   "displayName": "DeepSeek Copilot",
   "description": "AI-powered code completion using DeepSeek (GitHub Copilot alternative)",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "publisher": "exodus-tola",
   "engines": {
     "vscode": "^1.98.0"
@@ -30,6 +30,8 @@
   },
   "activationEvents": [
     "onStartupFinished",
+    "onCommand:deepseek-copilot.setApiKey",
+    "onCommand:deepseek-copilot.clearApiKey",
     "onLanguage:javascript",
     "onLanguage:typescript",
     "onLanguage:python",
@@ -92,28 +94,49 @@
           "description": "Delay before showing suggestions (ms)",
           "minimum": 0,
           "maximum": 2000
+        },
+        "deepseekCopilot.contextLines": {
+          "type": "number",
+          "default": 10,
+          "description": "Number of context lines to consider for suggestions",
+          "minimum": 1,
+          "maximum": 50
+        },
+        "deepseekCopilot.timeout": {
+          "type": "number",
+          "default": 15000,
+          "description": "API timeout in milliseconds",
+          "minimum": 5000,
+          "maximum": 60000
+        },
+        "deepseekCopilot.cacheTTL": {
+          "type": "number",
+          "default": 300,
+          "description": "Cache time-to-live in seconds",
+          "minimum": 0,
+          "maximum": 3600
         }
       }
     },
     "commands": [
       {
         "command": "deepseek-copilot.setApiKey",
-        "title": "Set DeepSeek API Key",
+        "title": "DeepSeek Copilot: Set API Key",
         "category": "DeepSeek Copilot"
       },
       {
         "command": "deepseek-copilot.clearApiKey",
-        "title": "Clear Saved API Key",
+        "title": "DeepSeek Copilot: Clear API Key",
         "category": "DeepSeek Copilot"
       },
       {
         "command": "deepseek-copilot.explainCode",
-        "title": "Explain Selected Code",
+        "title": "DeepSeek Copilot: Explain Selected Code",
         "category": "DeepSeek Copilot"
       },
       {
         "command": "deepseek-copilot.suggestCode",
-        "title": "Get Code Suggestion",
+        "title": "DeepSeek Copilot: Get Code Suggestion",
         "category": "DeepSeek Copilot"
       }
     ],
@@ -123,6 +146,12 @@
         "key": "ctrl+alt+e",
         "mac": "cmd+alt+e",
         "when": "editorHasSelection"
+      },
+      {
+        "command": "deepseek-copilot.suggestCode",
+        "key": "ctrl+alt+s",
+        "mac": "cmd+alt+s",
+        "when": "editorTextFocus"
       }
     ]
   },
