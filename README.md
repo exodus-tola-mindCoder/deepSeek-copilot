@@ -92,9 +92,12 @@ No! End users should install from the Marketplace. Manual builds are only for co
 5. Open a Pull Request
 
 
-Made with ❤️ by [![@exodus_tola](https://img.shields.io/badge/-@exodus__tola-181717?style=flat&logo=github&labelColor=181717&color=white)](https://github.com/exodus-tola-mindCoder)
 
-📜 License 
-MIT © [![@exodus_tola](https://img.shields.io/badge/-@exodus__tola-181717?style=flat&logo=github&labelColor=181717&color=white)](https://github.com/exodus-tola-mindCoder)
 
-[![GitHub](https://img.shields.io/badge/-@exodus__tola-181717?style=flat&logo=github)](https://github.com/exodus-tola-mindCoder)
+
+  Made with ❤️ by [![@exodus_tola](https://img.shields.io/badge/-@exodus__tola-181717?style=flat&logo=github&labelColor=181717&color=white)](https://github.com/exodus-tola-mindCoder)
+
+  📜 License 
+   © [![@exodus_tola](https://img.shields.io/badge/-@exodus__tola-181717?style=flat&logo=github&labelColor=181717&color=white)](https://github.com/exodus-tola-mindCoder)
+
+  [![GitHub](https://img.shields.io/badge/-@exodus__tola-181717?style=flat&logo=github)](https://github.com/exodus-tola-mindCoder)
