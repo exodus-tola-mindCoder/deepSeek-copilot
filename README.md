@@ -1,12 +1,10 @@
 # DeepSeek Copilot 🤖💻  
 
-[![VS Code Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/Exodus_Tola.deepseek-copilot?color=blue&label=VS%20Code%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=Exodus_Tola.deepseek-copilot)  
+[![VS Code Marketplace Version](https://marketplace.visualstudio.com/items?itemName=exodus-tola.deepseek-copilot)](https://marketplace.visualstudio.com/items?itemName=Exodus_Tola.deepseek-copilot)  
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)  
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/exodus-tola-mindCoder/DeepSeek-Copilot/pulls)  
 
 An AI-powered VS Code extension that provides **intelligent code completions** and **explanations** using the [DeepSeek API](https://platform.deepseek.com).  
-
-![Demo GIF](https://github.com/exodus-tola-mindCoder/DeepSeek-Copilot/raw/main/images/demo.gif)  
 
 ---
 
