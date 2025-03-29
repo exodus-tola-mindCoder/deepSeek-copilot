@@ -2,7 +2,7 @@
   "name": "deepseek-copilot",
   "displayName": "DeepSeek Copilot",
   "description": "AI-powered code completion using DeepSeek (GitHub Copilot alternative)",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "exodus-tola",
   "engines": {
     "vscode": "^1.98.0"
@@ -29,6 +29,7 @@
     "url": "https://github.com/exodus-tola-mindCoder/DeepSeek-Copilot/issues"
   },
   "activationEvents": [
+    "onStartupFinished",
     "onLanguage:javascript",
     "onLanguage:typescript",
     "onLanguage:python",

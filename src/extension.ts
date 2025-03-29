@@ -5,9 +5,11 @@ import { registerExplainCommand } from './providers/explain';
 import { registerInlineCompletionProvider } from './providers/inline';
 
 export async function activate(context: vscode.ExtensionContext) {
+        console.log('DeepSeek Copilot activating...'); 
     try {
         // Initialize auth service
         AuthService.init(context);
+        console.log('Registered commands:', vscode.commands.getCommands());
 
         // Register commands
         context.subscriptions.push(
