@@ -2,10 +2,10 @@
   "name": "deepseek-copilot",
   "displayName": "DeepSeek Copilot",
   "description": "AI-powered code completion using DeepSeek (GitHub Copilot alternative)",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "publisher": "exodus-tola",
   "engines": {
-    "vscode": "^1.98.0"
+    "vscode": "^1.56.0"
   },
   "license": "MIT",
   "type": "module",
@@ -158,7 +158,7 @@
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
-    "@types/vscode": "^1.98.0",
+    "@types/vscode": "^1.56.0",
     "@typescript-eslint/eslint-plugin": "^8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
     "@vscode/test-electron": "^2.4.1",
