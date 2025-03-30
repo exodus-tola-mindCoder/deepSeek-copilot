@@ -11,15 +11,11 @@ let isActivated = false;
 let disposables: vscode.Disposable[] = [];
 
 export async function activate(context: vscode.ExtensionContext) {
-    if (isActivated) {
-        return;
-    }
-
-    console.log('DeepSeek Copilot activating...'); 
+    console.log('DeepSeek Copilot activating...');
 
     try {
         // Initialize auth service first
-        AuthService.init(context);
+        await AuthService.init(context);
 
         // Register status bar item
         const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
@@ -29,7 +25,7 @@ export async function activate(context: vscode.ExtensionContext) {
         context.subscriptions.push(statusBarItem);
         statusBarItem.show();
 
-        // Register all commands
+        // Register all commands first
         const commands = [
             {
                 command: 'deepseek-copilot.setApiKey',
@@ -37,7 +33,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     try {
                         const newKey = await AuthService.promptForApiKey();
                         if (newKey) {
-                            vscode.window.showInformationMessage('✅ DeepSeek Copilot: API key saved securely');
+                            await vscode.window.showInformationMessage('✅ DeepSeek Copilot: API key saved securely');
                             statusBarItem.text = "$(check) DeepSeek Copilot";
                             statusBarItem.tooltip = "API key configured";
                             // Refresh providers after API key is set
@@ -45,7 +41,7 @@ export async function activate(context: vscode.ExtensionContext) {
                         }
                     } catch (error: unknown) {
                         const message = error instanceof Error ? error.message : 'Failed to save API key';
-                        vscode.window.showErrorMessage(`❌ DeepSeek Copilot: ${message}`);
+                        await vscode.window.showErrorMessage(`❌ DeepSeek Copilot: ${message}`);
                         console.error('Set API key error:', error);
                         statusBarItem.text = "$(key) DeepSeek Copilot";
                         statusBarItem.tooltip = "Click to set API key";
@@ -57,14 +53,14 @@ export async function activate(context: vscode.ExtensionContext) {
                 callback: async () => {
                     try {
                         await AuthService.clearApiKey();
-                        vscode.window.showInformationMessage('✅ DeepSeek Copilot: API key cleared successfully');
+                        await vscode.window.showInformationMessage('✅ DeepSeek Copilot: API key cleared successfully');
                         statusBarItem.text = "$(key) DeepSeek Copilot";
                         statusBarItem.tooltip = "Click to set API key";
                         // Dispose existing providers
                         disposeProviders();
                     } catch (error: unknown) {
                         const message = error instanceof Error ? error.message : 'Failed to clear API key';
-                        vscode.window.showErrorMessage(`❌ DeepSeek Copilot: ${message}`);
+                        await vscode.window.showErrorMessage(`❌ DeepSeek Copilot: ${message}`);
                         console.error('Clear API key error:', error);
                     }
                 }
@@ -74,30 +70,30 @@ export async function activate(context: vscode.ExtensionContext) {
                 callback: async () => {
                     const editor = vscode.window.activeTextEditor;
                     if (!editor) {
-                        vscode.window.showErrorMessage('No active editor found');
+                        await vscode.window.showErrorMessage('No active editor found');
                         return;
                     }
 
                     const selection = editor.selection;
                     if (selection.isEmpty) {
-                        vscode.window.showErrorMessage('Please select some code to explain');
+                        await vscode.window.showErrorMessage('Please select some code to explain');
                         return;
                     }
 
                     const selectedCode = editor.document.getText(selection);
                     if (!selectedCode) {
-                        vscode.window.showErrorMessage('No code selected');
+                        await vscode.window.showErrorMessage('No code selected');
                         return;
                     }
 
                     const apiKey = await AuthService.getApiKey();
                     if (!apiKey) {
-                        vscode.window.showErrorMessage('API key not found. Please set your API key first.');
+                        await vscode.window.showErrorMessage('API key not found. Please set your API key first.');
                         return;
                     }
 
                     try {
-                        vscode.window.showInformationMessage('Generating explanation...');
+                        await vscode.window.showInformationMessage('Generating explanation...');
                         const explanation = await generateExplanation(selectedCode, apiKey);
 
                         const panel = vscode.window.createWebviewPanel(
@@ -111,9 +107,9 @@ export async function activate(context: vscode.ExtensionContext) {
                         );
 
                         panel.webview.html = getWebviewContent(selectedCode, explanation);
-                        vscode.window.showInformationMessage('Explanation generated successfully!');
+                        await vscode.window.showInformationMessage('Explanation generated successfully!');
                     } catch (error) {
-                        vscode.window.showErrorMessage(`Failed to generate explanation: ${error instanceof Error ? error.message : String(error)}`);
+                        await vscode.window.showErrorMessage(`Failed to generate explanation: ${error instanceof Error ? error.message : String(error)}`);
                     }
                 }
             },
@@ -123,7 +119,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     try {
                         const editor = vscode.window.activeTextEditor;
                         if (!editor) {
-                            vscode.window.showWarningMessage('DeepSeek Copilot: No active editor');
+                            await vscode.window.showWarningMessage('DeepSeek Copilot: No active editor');
                             return;
                         }
 
@@ -164,14 +160,14 @@ export async function activate(context: vscode.ExtensionContext) {
                                         editBuilder.replace(selection, suggestion.text);
                                     }
                                 });
-                                vscode.window.showInformationMessage('✅ DeepSeek Copilot: Code suggestion applied');
+                                await vscode.window.showInformationMessage('✅ DeepSeek Copilot: Code suggestion applied');
                             }
                         } else {
-                            vscode.window.showInformationMessage('ℹ️ DeepSeek Copilot: No suggestions available');
+                            await vscode.window.showInformationMessage('ℹ️ DeepSeek Copilot: No suggestions available');
                         }
                     } catch (error: unknown) {
                         const message = error instanceof Error ? error.message : 'Failed to generate suggestion';
-                        vscode.window.showErrorMessage(`❌ DeepSeek Copilot: ${message}`);
+                        await vscode.window.showErrorMessage(`❌ DeepSeek Copilot: ${message}`);
                         console.error('Suggest code error:', error);
                     }
                 }
@@ -180,19 +176,20 @@ export async function activate(context: vscode.ExtensionContext) {
 
         // Register all commands
         commands.forEach(({ command, callback }) => {
-            context.subscriptions.push(
-                vscode.commands.registerCommand(command, callback)
-            );
+            const disposable = vscode.commands.registerCommand(command, callback);
+            context.subscriptions.push(disposable);
+            console.log(`Registered command: ${command}`);
         });
 
         // Verify API key and register providers
         await initializeWithApiKey(context, statusBarItem);
 
         isActivated = true;
+        console.log('DeepSeek Copilot activated successfully');
     } catch (error: unknown) {
         isActivated = false;
         const message = error instanceof Error ? error.message : 'Failed to activate extension';
-        vscode.window.showErrorMessage(`❌ DeepSeek Copilot failed to activate: ${message}`);
+        await vscode.window.showErrorMessage(`❌ DeepSeek Copilot failed to activate: ${message}`);
         console.error('Activation error:', error);
         throw error; // Rethrow to notify VS Code of activation failure
     }

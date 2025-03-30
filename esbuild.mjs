@@ -2,8 +2,9 @@ import { build } from 'esbuild';
 import { nodeExternalsPlugin } from 'esbuild-node-externals';
 
 const isProduction = process.argv.includes('--production');
+const isWatch = process.argv.includes('--watch');
 
-build({
+const buildOptions = {
 	entryPoints: ['src/extension.ts'],
 	bundle: true,
 	outfile: 'dist/extension.js',
@@ -16,5 +17,25 @@ build({
 	plugins: [nodeExternalsPlugin()],
 	define: {
 		'process.env.NODE_ENV': isProduction ? '"production"' : '"development"'
+	},
+	loader: {
+		'.ts': 'ts'
 	}
-}).catch(() => process.exit(1));
+};
+
+if (isWatch) {
+	const ctx = await build({
+		...buildOptions,
+		watch: {
+			onRebuild(error) {
+				if (error) { console.error('Build failed:', error); }
+				else { console.log('Build succeeded'); }
+			}
+		}
+	});
+} else {
+	build(buildOptions).catch((error) => {
+		console.error('Build failed:', error);
+		process.exit(1);
+	});
+}
