@@ -16,7 +16,7 @@ interface Suggestion {
     documentation?: string;
 }
 
-const API_URL = 'https://api.deepseek.com/v1/completions';
+const API_URL = 'https://api.deepseek.com/v1';
 const RATE_LIMIT_DELAY = 1000; // 1 second between requests
 let lastRequestTime = 0;
 
@@ -36,7 +36,7 @@ export async function getCodeSuggestion(
         const maxTokens = config.get<number>('maxTokens', 100);
 
         const response = await axios.post(
-            'https://api.deepseek.com/v1/chat/completions',
+            `${API_URL}`
             {
                 model: "deepseek-chat",
                 messages: [
