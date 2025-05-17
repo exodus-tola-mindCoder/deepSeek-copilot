@@ -1,3 +1,8 @@
 {
-  "workbench.colorTheme": "Oceanic Next"
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "eslint.validate": ["typescript"],
+  "npm.packageManager": "pnpm",
+  "debug.javascript.autoAttachFilter": "disabled"
 }

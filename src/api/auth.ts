@@ -4,11 +4,9 @@ export class AuthService {
     private static context: vscode.ExtensionContext;
     private static readonly API_KEY_SECRET = 'deepseekApiKey';
     private static readonly MAX_RETRIES = 3;
-    private static retryCount = 0;
 
     public static init(context: vscode.ExtensionContext): void {
         this.context = context;
-        this.retryCount = 0;
     }
 
     public static async getApiKey(): Promise<string> {
@@ -16,47 +14,54 @@ export class AuthService {
             throw new Error('AuthService not initialized');
         }
 
-        try {
-            // Check VS Code secrets
-            const key = await this.context.secrets.get(this.API_KEY_SECRET);
-            if (key) {
-                // Validate the stored key
-                if (this.validateApiKey(key)) {
-                    this.retryCount = 0; // Reset retry count on success
-                    return key;
+        let attempts = 0;
+        const maxAttempts = this.MAX_RETRIES + 1; // Total attempts including the first one
+
+        while (attempts < maxAttempts) {
+            try {
+                const key = await this.context.secrets.get(this.API_KEY_SECRET);
+                if (key) {
+                    if (this.validateApiKey(key)) {
+                        return key; // Valid key found
+                    } else {
+                        console.warn('Stored API key is invalid. Clearing and prompting for a new one.');
+                        await this.clearApiKeyInternal(); // Clear the invalid key silently
+                        // Proceed to prompt for a new key in this attempt cycle
+                        return await this.promptForApiKey();
+                    }
                 } else {
-                    console.warn('Stored API key is invalid, clearing and requesting new one');
-                    await this.clearApiKey();
-                    return this.promptForApiKey();
+                    // No key found in secrets, prompt the user
+                    return await this.promptForApiKey();
                 }
+            } catch (error) {
+                attempts++;
+                console.error(`Attempt ${attempts}/${maxAttempts} to get API key failed:`, error);
+                if (attempts >= maxAttempts) {
+                    throw new Error('Failed to retrieve API key after multiple attempts. Please try setting it again.');
+                }
+                // Optional: Add a small delay before retrying the entire getApiKey operation
+                // await new Promise(resolve => setTimeout(resolve, 200 * attempts));
             }
-            // Not found - prompt user
-            return this.promptForApiKey();
-        } catch (error) {
-            console.error('Error getting API key:', error);
-            
-            // Implement retry logic
-            if (this.retryCount < this.MAX_RETRIES) {
-                this.retryCount++;
-                console.log(`Retrying API key retrieval (attempt ${this.retryCount}/${this.MAX_RETRIES})`);
-                return this.getApiKey();
-            }
-            
-            throw new Error('Failed to retrieve API key after multiple attempts. Please try setting it again.');
         }
+        // This line should be unreachable if maxAttempts > 0 and logic is correct
+        throw new Error('Exhausted attempts to retrieve API key.');
     }
 
     public static async promptForApiKey(): Promise<string> {
+        if (!this.context) {
+            throw new Error('AuthService not initialized. Cannot prompt for API key.');
+        }
         try {
             const key = await vscode.window.showInputBox({
                 title: 'DeepSeek API Key',
                 prompt: 'Enter your API key from platform.deepseek.com',
                 password: true,
                 ignoreFocusOut: true,
-                validateInput: this.validateApiKeyInput.bind(this)
+                validateInput: this.validateApiKeyInput // No need to bind `this` for a static method
             });
 
             if (!key) {
+                // User cancelled the input box
                 throw new Error('API key entry cancelled');
             }
 
@@ -72,12 +77,29 @@ export class AuthService {
                 // If storage fails, try one more time
                 await this.context.secrets.store(this.API_KEY_SECRET, key);
             }
-
-            this.retryCount = 0; // Reset retry count on successful save
             return key;
         } catch (error) {
             console.error('Error prompting for API key:', error);
             throw error;
+        }
+    }
+
+    // Internal helper for clearing API key without throwing on final failure, used by getApiKey
+    private static async clearApiKeyInternal(): Promise<void> {
+        if (!this.context) {
+            console.warn('AuthService not initialized during internal clear.');
+            return;
+        }
+        try {
+            await this.context.secrets.delete(this.API_KEY_SECRET);
+        } catch (error) {
+            console.error('Error during initial internal API key clear:', error);
+            try {
+                await this.context.secrets.delete(this.API_KEY_SECRET); // Retry once
+            } catch (retryError) {
+                console.error('Error during retry of internal API key clear:', retryError);
+
+            }
         }
     }
 
@@ -87,7 +109,6 @@ export class AuthService {
         }
         try {
             await this.context.secrets.delete(this.API_KEY_SECRET);
-            this.retryCount = 0; // Reset retry count on successful clear
         } catch (error) {
             console.error('Error clearing API key:', error);
             // Try one more time
@@ -109,22 +130,17 @@ export class AuthService {
         if (value.length < 32) {
             return 'API key should be at least 32 characters long';
         }
-        if (!/^[a-zA-Z0-9_-]+$/.test(value.substring(3))) {
+        // The part after 'sk-' should consist of alphanumeric characters, underscores, or hyphens.
+        if (!/^[a-zA-Z0-9_-]+$/.test(value.substring(3))) { 
             return 'API key contains invalid characters';
         }
         return null;
     }
 
     private static validateApiKey(key: string): boolean {
-        try {
-            return (
-                key.startsWith('sk-') &&
-                key.length >= 32 &&
-                /^[a-zA-Z0-9_-]+$/.test(key.substring(3))
-            );
-        } catch (error) {
-            console.error('Error validating API key:', error);
-            return false;
-        }
+        return !!key && // Ensure key is not null or empty before other checks
+               key.startsWith('sk-') &&
+               key.length >= 32 &&
+               /^[a-zA-Z0-9_-]+$/.test(key.substring(3));
     }
 }

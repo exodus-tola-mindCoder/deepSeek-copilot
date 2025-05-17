@@ -5,11 +5,10 @@ export function registerInlineCompletionProvider(context: vscode.ExtensionContex
     const provider = vscode.languages.registerInlineCompletionItemProvider(
         [{ scheme: 'file' }, { scheme: 'untitled' }],
         {
-            async provideInlineCompletionItems(document, position) {
+            async provideInlineCompletionItems(document: vscode.TextDocument, position: vscode.Position) {
                 try {
                     const config = vscode.workspace.getConfiguration('deepseekCopilot');
                     const contextLines = config.get<number>('contextLines', 10);
-                    const timeout = config.get<number>('timeout', 15000);
 
                     const range = new vscode.Range(
                         new vscode.Position(Math.max(0, position.line - contextLines), 0),
@@ -22,12 +21,12 @@ export function registerInlineCompletionProvider(context: vscode.ExtensionContex
                         location: vscode.ProgressLocation.Notification,
                         title: "DeepSeek Copilot",
                         cancellable: false
-                    }, async (progress) => {
+                    }, async (progress: vscode.Progress<{ message?: string; increment?: number }>) => {
                         progress.report({ message: "Generating inline suggestions..." });
-                        return await getCodeSuggestion(prefix, context);
+                        return await getCodeSuggestion(prefix);
                     });
 
-                    return suggestions.map(suggestion => ({
+                    return suggestions.map((suggestion: { text: string }) => ({
                         insertText: suggestion.text,
                         range: new vscode.Range(position, position)
                     }));

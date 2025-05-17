@@ -30,6 +30,8 @@
   "activationEvents": [
     "onStartupFinished",
     "onCommand:deepseek-copilot.setApiKey",
+    "onCommand:deepseek-copilot.explainCode",
+    "onCommand:deepseek-copilot.suggestCode",
     "onCommand:deepseek-copilot.clearApiKey",
     "onLanguage:javascript",
     "onLanguage:typescript",
@@ -155,6 +157,7 @@
     ]
   },
   "devDependencies": {
+    "@types/axios": "^0.14.4",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
     "@types/vscode": "^1.56.0",
@@ -174,6 +177,6 @@
     "vitest": "^3.0.9"
   },
   "dependencies": {
-    "axios": "^1.8.4"
+    "axios": "^1.6.2"
   }
 }

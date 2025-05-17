@@ -9,15 +9,15 @@ function escapeHtml(unsafe: string): string {
         .replace(/'/g, "&#039;");
 }
 
-function sanitizeCode(code: string): string {
-    // Remove potentially dangerous HTML/script tags
-    return code.replace(/<[^>]*>/g, '');
-}
-
-export function getWebviewContent(code: string, explanation: string): string {
-    const sanitizedCode = sanitizeCode(code);
-    const escapedCode = escapeHtml(sanitizedCode);
+export function getWebviewContent(code: string, explanation: string, languageId: string = 'clike'): string {
+    // For displaying code, escaping is sufficient to prevent XSS.
+    // SanitizeCode might be too aggressive and remove valid code parts like generics.
+    const escapedCode = escapeHtml(code);
     const escapedExplanation = escapeHtml(explanation).replace(/\n/g, '<br>');
+    const prismTheme = 'prism-okaidia.css'; // Example theme, can be made configurable or use a default
+    const prismCore = 'prism.min.js';
+    const prismClike = 'prism-clike.min.js'; // Base for many languages
+    const prismLang = languageId !== 'clike' && languageId !== 'plaintext' ? `prism-${languageId}.min.js` : '';
 
     return `
         <!DOCTYPE html>
@@ -25,7 +25,11 @@ export function getWebviewContent(code: string, explanation: string): string {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline';">
+            <meta http-equiv="Content-Security-Policy" 
+                  content="default-src 'none'; 
+                           style-src 'unsafe-inline' https://cdnjs.cloudflare.com; 
+                           script-src 'unsafe-inline' https://cdnjs.cloudflare.com;">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/${prismTheme}" />
             <title>Code Explanation</title>
             <style>
                 body {
@@ -35,12 +39,14 @@ export function getWebviewContent(code: string, explanation: string): string {
                     line-height: 1.6;
                     color: var(--vscode-editor-foreground);
                     background-color: var(--vscode-editor-background);
+                    font-size: var(--vscode-editor-font-size);
                 }
                 pre {
                     background-color: var(--vscode-textBlockQuote-background);
                     padding: 1rem;
                     border-radius: 4px;
                     overflow-x: auto;
+                    font-family: var(--vscode-editor-font-family);
                 }
                 .explanation {
                     margin-top: 1.5rem;

@@ -4,9 +4,9 @@ import * as vscode from 'vscode';
 
 interface DeepSeekResponse {
     choices: Array<{
-        text: string;
-        detail?: string;
-        documentation?: string;
+        message: {
+            content: string;
+        };
     }>;
 }
 
@@ -21,8 +21,7 @@ const RATE_LIMIT_DELAY = 1000; // 1 second between requests
 let lastRequestTime = 0;
 
 export async function getCodeSuggestion(
-    prompt: string,
-    context: vscode.ExtensionContext
+    prompt: string
 ): Promise<Suggestion[]> {
     try {
         // Rate limiting
@@ -32,11 +31,14 @@ export async function getCodeSuggestion(
         lastRequestTime = Date.now();
 
         const apiKey = await AuthService.getApiKey();
+        if (!apiKey) {
+            throw new Error('API key is not configured. Please set it in the extension settings.');
+        }
         const config = vscode.workspace.getConfiguration('deepseekCopilot');
         const maxTokens = config.get<number>('maxTokens', 100);
 
         const response = await axios.post(
-            `${API_URL}`
+            `${API_URL}/chat/completions`,
             {
                 model: "deepseek-chat",
                 messages: [
@@ -74,5 +76,4 @@ export async function getCodeSuggestion(
         }
         throw error;
     }
-    return [];
 }

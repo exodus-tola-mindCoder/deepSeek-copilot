@@ -52,12 +52,12 @@ export function registerCompletionProvider(context: vscode.ExtensionContext): vs
                         location: vscode.ProgressLocation.Notification,
                         title: "DeepSeek Copilot",
                         cancellable: false
-                    }, async (progress) => {
+                    }, async (progress: vscode.Progress<{ message?: string; increment?: number }>) => {
                         progress.report({ message: "Generating code suggestions..." });
-                        return await getCodeSuggestion(prefix, context);
+                        return await getCodeSuggestion(prefix);
                     });
 
-                    const items = suggestions.map(suggestion => {
+                    const items = suggestions.map((suggestion: { text: string; detail?: string; documentation?: string }) => {
                         const item = new vscode.CompletionItem(
                             suggestion.text,
                             vscode.CompletionItemKind.Snippet

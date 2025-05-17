@@ -98,21 +98,17 @@ export function registerExplainCommand(context: vscode.ExtensionContext): vscode
             }
 
             try {
-                const config = vscode.workspace.getConfiguration('deepseekCopilot');
-                const maxTokens = config.get<number>('maxTokens', 100);
-                const timeout = config.get<number>('timeout', 15000);
-
                 const explanation = await vscode.window.withProgress({
                     location: vscode.ProgressLocation.Notification,
                     title: "DeepSeek Copilot",
                     cancellable: false
-                }, async (progress) => {
+                }, async (progress: vscode.Progress<{ message?: string; increment?: number }>) => {
                     progress.report({ message: "Generating explanation..." });
                     
                     const selectedText = editor.document.getText(selection);
                     const prompt = `Explain this code in detail:\n${selectedText}\n\nExplanation:`;
                     
-                    const result = await getCodeSuggestion(prompt, context);
+                    const result = await getCodeSuggestion(prompt);
                     return result[0]?.text || 'No explanation generated';
                 });
 
