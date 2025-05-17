@@ -17,7 +17,6 @@ interface Suggestion {
 }
 
 const API_URL = 'https://api.deepseek.com/v1';
-const RATE_LIMIT_DELAY = 1000; // 1 second between requests
 let lastRequestTime = 0;
 
 export async function getCodeSuggestion(
@@ -25,22 +24,30 @@ export async function getCodeSuggestion(
 ): Promise<Suggestion[]> {
     try {
         // Rate limiting
+        const config = vscode.workspace.getConfiguration('deepseekCopilot');
+        const rateLimitDelay = config.get<number>('rateLimitDelay', 1000); // Default to 1000ms
+
         const now = Date.now();
-        const delay = Math.max(0, RATE_LIMIT_DELAY - (now - lastRequestTime));
+        const delay = Math.max(0, rateLimitDelay - (now - lastRequestTime));
         await new Promise(resolve => setTimeout(resolve, delay));
         lastRequestTime = Date.now();
 
         const apiKey = await AuthService.getApiKey();
         if (!apiKey) {
-            throw new Error('API key is not configured. Please set it in the extension settings.');
+            // AuthService.getApiKey() should ideally handle prompting or throwing if it can't get a key.
+            // If it returns undefined/null, it means the user cancelled or it failed after retries.
+            throw new Error('API key is not available. Please set your DeepSeek API key.');
         }
-        const config = vscode.workspace.getConfiguration('deepseekCopilot');
+        
         const maxTokens = config.get<number>('maxTokens', 100);
+        const apiTimeout = config.get<number>('timeout', 15000);
+        const model = config.get<string>('model', 'deepseek-chat'); // Add 'model' to package.json config
+        const temperature = config.get<number>('temperature', 0.7); // Add 'temperature' to package.json config
 
         const response = await axios.post(
             `${API_URL}/chat/completions`,
             {
-                model: "deepseek-chat",
+                model: model,
                 messages: [
                     {
                         role: "user",
@@ -48,14 +55,14 @@ export async function getCodeSuggestion(
                     }
                 ],
                 max_tokens: maxTokens,
-                temperature: 0.7,
+                temperature: temperature,
             },
             {
                 headers: {
                     'Authorization': `Bearer ${apiKey}`,
                     'Content-Type': 'application/json'
                 },
-                timeout: 15000
+                timeout: apiTimeout
             }
         );
 
@@ -69,11 +76,26 @@ export async function getCodeSuggestion(
         }));
     } catch (error) {
         const axiosError = error as AxiosError;
-        console.error("API Error:", axiosError.response?.data);
-
-        if (axiosError.response?.status === 422) {
-            throw new Error("Invalid request format. Please update the extension.");
+        // Log the raw API response for debugging if available
+        if (axiosError.response?.data) {
+            console.error("DeepSeek API Error Response:", axiosError.response.data);
+        } else {
+            console.error("DeepSeek API Error:", error);
         }
-        throw error;
+
+        if (axiosError.response?.status === 401) { // Unauthorized
+            throw new Error('API key is invalid or unauthorized. Please check your API key and account status on platform.deepseek.com.');
+        }
+        if (axiosError.response?.status === 402) { // Payment Required
+            throw new Error('Payment Required. Please check your DeepSeek account billing status or API plan at platform.deepseek.com.');
+        }
+        if (axiosError.response?.status === 422) {
+            throw new Error("Invalid request format. This might be an issue with the extension or the API. Please check for updates or report the issue.");
+        }
+        if (axiosError.response?.status === 429) { // Too Many Requests
+            throw new Error('API rate limit exceeded. Please wait a moment and try again.');
+        }
+        // For other errors, rethrow a generic message or the original Axios error message
+        throw new Error(`API request failed: ${axiosError.message || String(error)}`);
     }
 }

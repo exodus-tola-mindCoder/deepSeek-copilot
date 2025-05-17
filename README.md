@@ -1,6 +1,6 @@
 # DeepSeek Copilot 🤖✨
 
-[![VS Code Version](https://img.shields.io/badge/VS%20Code-%3E%3D1.85-blue?logo=visual-studio-code)](https://code.visualstudio.com/)
+[![VS Code Version](https://img.shields.io/badge/VS%20Code-%5E1.56.0-blue?logo=visual-studio-code)](https://code.visualstudio.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
@@ -12,7 +12,7 @@ An AI-powered VS Code extension that provides intelligent code completions and e
 - **Smart Code Completion**: Context-aware suggestions for 10+ languages
 - **Code Explanation**: Highlight code → `Ctrl+Alt+E`/`Cmd+Alt+E` for instant analysis
 - **Secure API Integration**: Encrypted key storage via VS Code's Secret API
-- **Customizable**: Adjust token limits, suggestion delay, and more
+- **Highly Customizable**: Fine-tune model selection, token limits, temperature, context lines, timeouts, and more via VS Code settings.
 - **Multi-Language Support**: JavaScript, Python, Java, C++, Rust, Go, and more
 
 ## 📦 Installation
@@ -20,9 +20,10 @@ An AI-powered VS Code extension that provides intelligent code completions and e
 ### For Users
 [![Install Now](https://img.shields.io/badge/-Install%20from%20Marketplace-007ACC?logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=exodus-tola.deepseek-copilot)
 
-1. Open VS Code Extensions (`Ctrl+Shift+X`)
-2. Search for **"DeepSeek Copilot"**
-3. Click **Install**
+1.  Open VS Code Extensions view (`Ctrl+Shift+X` or `Cmd+Shift+X`).
+2.  Search for **"DeepSeek Copilot"**.
+3.  Click **Install**.
+4.  After installation, you'll be prompted to set your DeepSeek API key.
 
 ### For Developers
 ```bash
