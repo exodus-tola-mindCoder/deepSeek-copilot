@@ -2,7 +2,7 @@
   "name": "deepseek-copilot",
   "displayName": "DeepSeek Copilot",
   "description": "AI-powered code completion using DeepSeek (GitHub Copilot alternative)",
-  "version": "0.1.6",
+  "version": "0.1.9",
   "publisher": "exodus-tola",
   "engines": {
     "vscode": "^1.56.0"
@@ -103,12 +103,32 @@
           "minimum": 1,
           "maximum": 50
         },
+        "deepseekCopilot.model": {
+          "type": "string",
+          "default": "deepseek-chat",
+          "description": "The DeepSeek model to use for completions and explanations."
+        },
+        "deepseekCopilot.temperature": {
+          "type": "number",
+          "default": 0.7,
+          "description": "Controls randomness: lower values make output more focused, higher values make it more random.",
+          "minimum": 0.0,
+          "maximum": 2.0,
+          "markdownDescription": "Controls randomness in the model's output. Lower values (e.g., 0.2) make the output more deterministic and focused. Higher values (e.g., 0.8) make it more random and creative. Default is 0.7."
+        },
         "deepseekCopilot.timeout": {
           "type": "number",
           "default": 15000,
           "description": "API timeout in milliseconds",
           "minimum": 5000,
           "maximum": 60000
+        },
+        "deepseekCopilot.rateLimitDelay": {
+          "type": "number",
+          "default": 1000,
+          "description": "Minimum delay in milliseconds between consecutive API requests.",
+          "minimum": 0,
+          "maximum": 10000
         },
         "deepseekCopilot.cacheTTL": {
           "type": "number",
