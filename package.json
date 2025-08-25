@@ -2,7 +2,7 @@
   "name": "deepseek-copilot",
   "displayName": "DeepSeek Copilot",
   "description": "AI-powered code completion using DeepSeek (GitHub Copilot alternative)",
-  "version": "0.1.9",
+  "version": "1.1.0",
   "publisher": "exodus-tola",
   "engines": {
     "vscode": "^1.56.0"
@@ -71,10 +71,22 @@
     "configuration": {
       "title": "DeepSeek Copilot",
       "properties": {
+        "deepseekCopilot.provider": {
+          "type": "string",
+          "default": "deepseek",
+          "description": "AI Provider to use for code suggestions and explanations",
+          "enum": ["deepseek", "openai", "addis-ai"],
+          "enumDescriptions": [
+            "DeepSeek API (platform.deepseek.com)",
+            "OpenAI API (platform.openai.com)", 
+            "ADDIS AI API (api.addisassistant.com) - Supports Amharic and Afaan Oromo"
+          ],
+          "scope": "application"
+        },
         "deepseekCopilot.apiKey": {
           "type": "string",
           "default": "",
-          "description": "Your DeepSeek API key (get from platform.deepseek.com)",
+          "description": "Your API key for the selected provider",
           "scope": "application"
         },
         "deepseekCopilot.maxTokens": {

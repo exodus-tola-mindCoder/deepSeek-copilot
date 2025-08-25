@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
-import { getCodeSuggestion } from '../api/deepseek';
+import { ProviderFactory } from '../api/ProviderFactory';
+import { AuthService } from '../api/auth';
 
 // Cache implementation
 interface CacheEntry {
@@ -48,13 +49,16 @@ export function registerCompletionProvider(context: vscode.ExtensionContext): vs
                     }
 
                     // Show progress indicator
+                    const providerType = ProviderFactory.getDefaultProvider();
+                    const apiKey = await AuthService.getApiKey(providerType);
                     const suggestions = await vscode.window.withProgress({
                         location: vscode.ProgressLocation.Notification,
                         title: "DeepSeek Copilot",
                         cancellable: false
                     }, async (progress: vscode.Progress<{ message?: string; increment?: number }>) => {
                         progress.report({ message: "Generating code suggestions..." });
-                        return await getCodeSuggestion(prefix);
+                        const provider = ProviderFactory.createProvider(apiKey, providerType);
+                        return await provider.getCodeSuggestion(prefix);
                     });
 
                     const items = suggestions.map((suggestion: { text: string; detail?: string; documentation?: string }) => {

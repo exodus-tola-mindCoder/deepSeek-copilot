@@ -81,57 +81,8 @@ function getWebviewContent(code: string, explanation: string): string {
     `;
 }
 
-export function registerExplainCommand(context: vscode.ExtensionContext): vscode.Disposable {
-    const command = vscode.commands.registerCommand(
-        'deepseek-copilot.explainCode',
-        async () => {
-            const editor = vscode.window.activeTextEditor;
-            if (!editor) {
-                vscode.window.showWarningMessage('No active editor');
-                return;
-            }
+// This file contains utility functions for code explanation
+// The command registration has been moved to the main extension.ts file
+// to avoid duplicate command registration issues
 
-            const selection = editor.selection;
-            if (selection.isEmpty) {
-                vscode.window.showWarningMessage('No code selected');
-                return;
-            }
-
-            try {
-                const explanation = await vscode.window.withProgress({
-                    location: vscode.ProgressLocation.Notification,
-                    title: "DeepSeek Copilot",
-                    cancellable: false
-                }, async (progress: vscode.Progress<{ message?: string; increment?: number }>) => {
-                    progress.report({ message: "Generating explanation..." });
-                    
-                    const selectedText = editor.document.getText(selection);
-                    const prompt = `Explain this code in detail:\n${selectedText}\n\nExplanation:`;
-                    
-                    const result = await getCodeSuggestion(prompt);
-                    return result[0]?.text || 'No explanation generated';
-                });
-
-                const panel = vscode.window.createWebviewPanel(
-                    'deepseekExplanation',
-                    'Code Explanation',
-                    vscode.ViewColumn.Beside,
-                    { 
-                        enableScripts: false,
-                        retainContextWhenHidden: true
-                    }
-                );
-
-                panel.webview.html = getWebviewContent(editor.document.getText(selection), explanation);
-            } catch (error) {
-                if (error instanceof Error) {
-                    vscode.window.showErrorMessage(`DeepSeek Copilot: ${error.message}`);
-                }
-                console.error('Explanation error:', error);
-            }
-        }
-    );
-
-    context.subscriptions.push(command);
-    return command;
-}
+// Webview content generation functions remain here for code organization

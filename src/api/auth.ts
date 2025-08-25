@@ -1,81 +1,79 @@
 import * as vscode from 'vscode';
+import { ApiProviderType, ProviderFactory } from './ProviderFactory';
 
 export class AuthService {
     private static context: vscode.ExtensionContext;
-    private static readonly API_KEY_SECRET = 'deepseekApiKey';
     private static readonly MAX_RETRIES = 3;
 
     public static init(context: vscode.ExtensionContext): void {
         this.context = context;
     }
 
-    public static async getApiKey(): Promise<string> {
+    public static async getApiKey(providerType: ApiProviderType = ProviderFactory.getDefaultProvider()): Promise<string> {
         if (!this.context) {
             throw new Error('AuthService not initialized');
         }
 
+        const secretName = ProviderFactory.getApiKeySecretName(providerType);
         let attempts = 0;
-        const maxAttempts = this.MAX_RETRIES + 1; // Total attempts including the first one
+        const maxAttempts = this.MAX_RETRIES + 1;
 
         while (attempts < maxAttempts) {
             try {
-                const key = await this.context.secrets.get(this.API_KEY_SECRET);
+                const key = await this.context.secrets.get(secretName);
                 if (key) {
-                    if (this.validateApiKey(key)) {
+                    if (ProviderFactory.validateApiKey(key, providerType)) {
                         return key; // Valid key found
                     } else {
-                        console.warn('Stored API key is invalid. Clearing and prompting for a new one.');
-                        await this.clearApiKeyInternal(); // Clear the invalid key silently
+                        console.warn(`Stored ${ProviderFactory.getProviderDisplayName(providerType)} API key is invalid. Clearing and prompting for a new one.`);
+                        await this.clearApiKeyInternal(providerType); // Clear the invalid key silently
                         // Proceed to prompt for a new key in this attempt cycle
-                        return await this.promptForApiKey();
+                        return await this.promptForApiKey(providerType);
                     }
                 } else {
                     // No key found in secrets, prompt the user
-                    return await this.promptForApiKey();
+                    return await this.promptForApiKey(providerType);
                 }
             } catch (error) {
                 attempts++;
-                console.error(`Attempt ${attempts}/${maxAttempts} to get API key failed:`, error);
+                console.error(`Attempt ${attempts}/${maxAttempts} to get ${ProviderFactory.getProviderDisplayName(providerType)} API key failed:`, error);
                 if (attempts >= maxAttempts) {
-                    throw new Error('Failed to retrieve API key after multiple attempts. Please try setting it again.');
+                    throw new Error(`Failed to retrieve ${ProviderFactory.getProviderDisplayName(providerType)} API key after multiple attempts. Please try setting it again.`);
                 }
-                // Optional: Add a small delay before retrying the entire getApiKey operation
-                // await new Promise(resolve => setTimeout(resolve, 200 * attempts));
             }
         }
-        // This line should be unreachable if maxAttempts > 0 and logic is correct
         throw new Error('Exhausted attempts to retrieve API key.');
     }
 
-    public static async promptForApiKey(): Promise<string> {
+    public static async promptForApiKey(providerType: ApiProviderType = ProviderFactory.getDefaultProvider()): Promise<string> {
         if (!this.context) {
             throw new Error('AuthService not initialized. Cannot prompt for API key.');
         }
         try {
+            const providerName = ProviderFactory.getProviderDisplayName(providerType);
             const key = await vscode.window.showInputBox({
-                title: 'DeepSeek API Key',
-                prompt: 'Enter your API key from platform.deepseek.com',
+                title: `${providerName} API Key`,
+                prompt: `Enter your ${providerName} API key`,
                 password: true,
                 ignoreFocusOut: true,
-                validateInput: this.validateApiKeyInput // No need to bind `this` for a static method
+                validateInput: (value) => this.validateApiKeyInput(value, providerType)
             });
 
             if (!key) {
-                // User cancelled the input box
                 throw new Error('API key entry cancelled');
             }
 
-            if (!this.validateApiKey(key)) {
-                throw new Error('Invalid API key format');
+            if (!ProviderFactory.validateApiKey(key, providerType)) {
+                throw new Error(`Invalid ${providerName} API key format`);
             }
 
             try {
-                // Store securely
-                await this.context.secrets.store(this.API_KEY_SECRET, key);
+                const secretName = ProviderFactory.getApiKeySecretName(providerType);
+                await this.context.secrets.store(secretName, key);
             } catch (storageError) {
                 console.error('Error storing API key, retrying...', storageError);
-                // If storage fails, try one more time
-                await this.context.secrets.store(this.API_KEY_SECRET, key);
+                const secretName = ProviderFactory.getApiKeySecretName(providerType);
+                await this.context.secrets.store(secretName, key);
             }
             return key;
         } catch (error) {
@@ -84,63 +82,54 @@ export class AuthService {
         }
     }
 
-    // Internal helper for clearing API key without throwing on final failure, used by getApiKey
-    private static async clearApiKeyInternal(): Promise<void> {
+    // Internal helper for clearing API key without throwing on final failure
+    private static async clearApiKeyInternal(providerType: ApiProviderType): Promise<void> {
         if (!this.context) {
             console.warn('AuthService not initialized during internal clear.');
             return;
         }
         try {
-            await this.context.secrets.delete(this.API_KEY_SECRET);
+            const secretName = ProviderFactory.getApiKeySecretName(providerType);
+            await this.context.secrets.delete(secretName);
         } catch (error) {
             console.error('Error during initial internal API key clear:', error);
             try {
-                await this.context.secrets.delete(this.API_KEY_SECRET); // Retry once
+                const secretName = ProviderFactory.getApiKeySecretName(providerType);
+                await this.context.secrets.delete(secretName);
             } catch (retryError) {
                 console.error('Error during retry of internal API key clear:', retryError);
-
             }
         }
     }
 
-    public static async clearApiKey(): Promise<void> {
+    public static async clearApiKey(providerType: ApiProviderType = ProviderFactory.getDefaultProvider()): Promise<void> {
         if (!this.context) {
             throw new Error('AuthService not initialized');
         }
         try {
-            await this.context.secrets.delete(this.API_KEY_SECRET);
+            const secretName = ProviderFactory.getApiKeySecretName(providerType);
+            await this.context.secrets.delete(secretName);
         } catch (error) {
             console.error('Error clearing API key:', error);
-            // Try one more time
             try {
-                await this.context.secrets.delete(this.API_KEY_SECRET);
+                const secretName = ProviderFactory.getApiKeySecretName(providerType);
+                await this.context.secrets.delete(secretName);
             } catch (retryError) {
                 throw new Error('Failed to clear API key after retry');
             }
         }
     }
 
-    private static validateApiKeyInput(value: string): string | null {
+    private static validateApiKeyInput(value: string, providerType: ApiProviderType): string | null {
         if (!value) {
             return 'API key cannot be empty';
         }
-        if (!value.startsWith('sk-')) {
-            return 'API key should start with "sk-"';
+        
+        if (!ProviderFactory.validateApiKey(value, providerType)) {
+            const providerName = ProviderFactory.getProviderDisplayName(providerType);
+            return `Invalid ${providerName} API key format`;
         }
-        if (value.length < 32) {
-            return 'API key should be at least 32 characters long';
-        }
-        // The part after 'sk-' should consist of alphanumeric characters, underscores, or hyphens.
-        if (!/^[a-zA-Z0-9_-]+$/.test(value.substring(3))) { 
-            return 'API key contains invalid characters';
-        }
+        
         return null;
-    }
-
-    private static validateApiKey(key: string): boolean {
-        return !!key && // Ensure key is not null or empty before other checks
-               key.startsWith('sk-') &&
-               key.length >= 32 &&
-               /^[a-zA-Z0-9_-]+$/.test(key.substring(3));
     }
 }

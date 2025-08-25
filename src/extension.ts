@@ -2,9 +2,9 @@ import * as vscode from 'vscode';
 import { AuthService } from './api/auth';
 import { registerCompletionProvider } from './providers/completion';
 import { registerInlineCompletionProvider } from './providers/inline';
-import { getCodeSuggestion } from './api/deepseek';
 import { getWebviewContent } from './utils/webview';
 import { generateExplanation } from './api/explanation';
+import { ApiProviderType, ProviderFactory } from './api/ProviderFactory';
 
 let disposables: vscode.Disposable[] = [];
 
@@ -17,10 +17,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
         // Helper function to prompt for API key if not set
         const ensureApiKeyOrPrompt = async (): Promise<string | undefined> => {
-            const apiKey = await AuthService.getApiKey();
+            const providerType = ProviderFactory.getDefaultProvider();
+            const apiKey = await AuthService.getApiKey(providerType);
             if (!apiKey) {
                 await promptAndSetApiKey();
-                return await AuthService.getApiKey(); // Re-fetch after attempting to set
+                return await AuthService.getApiKey(providerType); // Re-fetch after attempting to set
             }
             return apiKey;
         };
@@ -35,7 +36,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
         const promptAndSetApiKey = async () => {
             try {
-                const newKey = await AuthService.promptForApiKey();
+                const providerType = ProviderFactory.getDefaultProvider();
+                const newKey = await AuthService.promptForApiKey(providerType);
                 if (newKey) {
                     await vscode.window.showInformationMessage('✅ DeepSeek Copilot: API key saved securely');
                     statusBarItem.text = "$(check) DeepSeek Copilot";
@@ -57,12 +59,15 @@ export async function activate(context: vscode.ExtensionContext) {
             {
                 command: 'deepseek-copilot.setApiKey',
                 callback: promptAndSetApiKey
+
+                
             },
             {
                 command: 'deepseek-copilot.clearApiKey',
                 callback: async () => {
                     try {
-                        await AuthService.clearApiKey();
+                        const providerType = ProviderFactory.getDefaultProvider();
+                        await AuthService.clearApiKey(providerType);
                         await vscode.window.showInformationMessage('✅ DeepSeek Copilot: API key cleared successfully');
                         statusBarItem.text = "$(key) DeepSeek Copilot";
                         statusBarItem.tooltip = "Click to set API key";
@@ -145,13 +150,15 @@ export async function activate(context: vscode.ExtensionContext) {
                             editor.document.getText() : 
                             editor.document.getText(selection);
 
+                        const providerType = ProviderFactory.getDefaultProvider();
+                        const provider = ProviderFactory.createProvider(apiKey, providerType);
                         const suggestions = await vscode.window.withProgress({
                             location: vscode.ProgressLocation.Notification,
                             title: "DeepSeek Copilot",
                             cancellable: false
                         }, async (progress: vscode.Progress<{ message?: string; increment?: number }>) => {
                             progress.report({ message: "Generating code suggestions..." });
-                            return await getCodeSuggestion(text);
+                            return await provider.getCodeSuggestion(text);
                         });
 
                         if (suggestions && suggestions.length > 0) {
@@ -182,8 +189,12 @@ export async function activate(context: vscode.ExtensionContext) {
         commands.forEach(({ command, callback }) => {
             const disposable = vscode.commands.registerCommand(command, callback);
             context.subscriptions.push(disposable);
-            console.log(`Registered command: ${command}`);
+            console.log(`✅ Registered command: ${command}`);
         });
+        
+        // Log all available commands for debugging
+        const registeredCommands = commands.map(cmd => cmd.command);
+        console.log(`📋 Available DeepSeek Copilot commands: ${registeredCommands.join(', ')}`);
 
         // Verify API key and register providers
         await initializeWithApiKey(context, statusBarItem);
@@ -198,7 +209,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
 async function initializeWithApiKey(context: vscode.ExtensionContext, statusBarItem: vscode.StatusBarItem) {
     try {
-        const apiKey = await AuthService.getApiKey();
+        const providerType = ProviderFactory.getDefaultProvider();
+        const apiKey = await AuthService.getApiKey(providerType);
         if (!apiKey) {
             statusBarItem.text = "$(key) DeepSeek Copilot";
             statusBarItem.tooltip = "Click to set API key";
@@ -209,7 +221,7 @@ async function initializeWithApiKey(context: vscode.ExtensionContext, statusBarI
             if (selection === 'Set API Key') {
                 await vscode.commands.executeCommand('deepseek-copilot.setApiKey');
                 // After attempting to set, re-check and register providers if successful
-                if (await AuthService.getApiKey()) {
+                if (await AuthService.getApiKey(providerType)) {
                     statusBarItem.text = "$(check) DeepSeek Copilot";
                     statusBarItem.tooltip = "API key configured";
                     await registerProviders(context);
