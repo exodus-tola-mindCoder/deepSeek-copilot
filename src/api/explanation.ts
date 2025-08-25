@@ -1,4 +1,4 @@
-import { ApiProviderType, ProviderFactory } from './ProviderFactory';
+import { ProviderFactory } from './ProviderFactory';
 import { AuthService } from './auth';
 
 export async function generateExplanation(code: string): Promise<string> {

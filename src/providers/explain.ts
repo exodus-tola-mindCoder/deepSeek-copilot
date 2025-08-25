@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import { getCodeSuggestion } from '../api/deepseek';
 
 function escapeHtml(unsafe: string): string {
     return unsafe

@@ -8,7 +8,7 @@ export class AddisAiProvider implements IApiProvider {
 
     constructor(private apiKey: string) {}
 
-    async getCodeSuggestion(prompt: string, targetLanguage?: string): Promise<Suggestion[]> {
+    async getCodeSuggestion(prompt: string): Promise<Suggestion[]> {
         try {
             // Rate limiting
             const config = vscode.workspace.getConfiguration('deepseekCopilot');
@@ -27,7 +27,7 @@ export class AddisAiProvider implements IApiProvider {
                 AddisAiProvider.API_URL,
                 {
                     prompt: prompt,
-                    target_language: targetLanguage || 'en', // Default to English
+                    target_language: 'en', // Default to English for code generation
                     generation_config: {
                         temperature: temperature,
                         max_tokens: maxTokens,

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { getCodeSuggestion } from '../api/deepseek';
-
+import { ProviderFactory } from '../api/ProviderFactory';
+import { AuthService } from '../api/auth';
 export function registerInlineCompletionProvider(context: vscode.ExtensionContext): vscode.Disposable {
     const provider = vscode.languages.registerInlineCompletionItemProvider(
         [{ scheme: 'file' }, { scheme: 'untitled' }],
@@ -17,13 +17,16 @@ export function registerInlineCompletionProvider(context: vscode.ExtensionContex
                     const prefix = document.getText(range);
 
                     // Show progress indicator
+                    const providerType = ProviderFactory.getDefaultProvider();
+                    const apiKey = await AuthService.getApiKey(providerType);
+                    const provider = ProviderFactory.createProvider(apiKey, providerType);
                     const suggestions = await vscode.window.withProgress({
                         location: vscode.ProgressLocation.Notification,
                         title: "DeepSeek Copilot",
                         cancellable: false
                     }, async (progress: vscode.Progress<{ message?: string; increment?: number }>) => {
                         progress.report({ message: "Generating inline suggestions..." });
-                        return await getCodeSuggestion(prefix);
+                        return await provider.getCodeSuggestion(prefix);
                     });
 
                     return suggestions.map((suggestion: { text: string }) => ({

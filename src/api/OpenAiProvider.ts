@@ -8,7 +8,7 @@ export class OpenAiProvider implements IApiProvider {
 
     constructor(private apiKey: string) {}
 
-    async getCodeSuggestion(prompt: string, targetLanguage?: string): Promise<Suggestion[]> {
+    async getCodeSuggestion(prompt: string): Promise<Suggestion[]> {
         try {
             // Rate limiting
             const config = vscode.workspace.getConfiguration('deepseekCopilot');
